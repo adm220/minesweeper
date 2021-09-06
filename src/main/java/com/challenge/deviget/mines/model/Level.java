@@ -6,7 +6,7 @@ public enum Level {
     Level(int row, int collumn, int bombs){
         this.row = row;
         this.collumn = collumn;
-        this.bombs = bombs;
+        this.mines = bombs;
     }
     private final int row;
 
@@ -18,10 +18,10 @@ public enum Level {
         return collumn;
     }
 
-    public int getBombs() {
-        return bombs;
+    public int getMines() {
+        return mines;
     }
 
     private final int collumn;
-    private final int bombs;
+    private final int mines;
 }

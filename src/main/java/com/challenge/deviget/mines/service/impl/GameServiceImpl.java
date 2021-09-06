@@ -27,6 +27,9 @@ public class GameServiceImpl implements GameService {
             }
             matrixBoard = BoardHelper.initializeBoardGame(boardRequest);
 
+            BoardHelper.randomlyInstallMines(boardRequest, matrixBoard);
+            BoardHelper.setMinesArround(boardRequest, matrixBoard);
+
 
 
             GameEntity game = GameEntity.builder()
