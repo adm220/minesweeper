@@ -9,6 +9,5 @@ target/
 *.iml
 *.ipr
 
-
 ### VS Code ###
 .vscode/
