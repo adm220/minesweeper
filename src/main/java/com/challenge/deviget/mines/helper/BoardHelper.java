@@ -68,4 +68,39 @@ public class BoardHelper {
         }
     }
 
+    public static boolean mineFound(Cell[][] matrix, int row, int column) {
+        return matrix[row][column].isMine();
+    }
+
+    public static boolean alreadyWon(Cell[][] matrix) {
+        for (int i=0 ; i < matrix.length ; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                if (!matrix[i][j].isMine() && !matrix[i][j].isRevealed()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static void clearEmptySpots(Cell[][] matrix, int x, int y, int xMax, int yMax) {
+        // Base Case
+        if (x < 0 || x > xMax || y < 0 || y > yMax){
+            return;
+        }
+
+        if ( matrix[x][y].getMinesAround() == 0 && !matrix[x][y].isRevealed()) {
+            matrix[x][y].setRevealed(true);
+            clearEmptySpots(matrix, x+1, y , xMax, yMax);
+            clearEmptySpots(matrix, x+1, y+1 , xMax, yMax);
+            clearEmptySpots(matrix, x+1, y-1 , xMax, yMax);
+            clearEmptySpots(matrix, x-1, y , xMax, yMax);
+            clearEmptySpots(matrix, x-1, y-1 , xMax, yMax);
+            clearEmptySpots(matrix, x-1, y+1 , xMax, yMax);
+            clearEmptySpots(matrix, x, y-1 , xMax, yMax);
+            clearEmptySpots(matrix, x, y+1 , xMax, yMax);
+        } else {
+            return;
+        }
+    }
 }
