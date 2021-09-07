@@ -6,6 +6,7 @@ import com.challenge.deviget.mines.exception.GameException;
 import com.challenge.deviget.mines.helper.BoardHelper;
 import com.challenge.deviget.mines.model.Cell;
 import com.challenge.deviget.mines.model.Game;
+import com.challenge.deviget.mines.model.Marks;
 import com.challenge.deviget.mines.model.States;
 import com.challenge.deviget.mines.model.entity.GameEntity;
 import com.challenge.deviget.mines.repository.GameRepository;
@@ -76,6 +77,30 @@ public class GameServiceImpl implements GameService {
                 game.get().setState(States.WON);
             }
         }
+        Game gameNew = new Game();
+        BeanUtils.copyProperties(gameRepository.save(game.get()),gameNew);
+
+        return gameNew;
+    }
+
+    @Override
+    public Game mark(String username, PlayRequest request, Marks mark) {
+        Optional<GameEntity> game = gameRepository.findByUserNameAndState(username, States.ACTIVE);
+
+        if (!game.isPresent()) {
+            throw new GameException(String.format("There's no active game for username=%s", username));
+        }
+
+        if (game.get().getMines()[request.getRow()][request.getColumn()].isRevealed()) {
+            throw new GameException("Cell already revealed");
+        }
+
+        if (mark.equals(Marks.FLAG)) {
+            game.get().setFlag(true);
+        } else {
+            game.get().setQuestionMark(true);
+        }
+
         Game gameNew = new Game();
         BeanUtils.copyProperties(gameRepository.save(game.get()),gameNew);
 

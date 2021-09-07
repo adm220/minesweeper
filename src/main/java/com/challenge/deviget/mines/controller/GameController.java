@@ -6,6 +6,7 @@ import com.challenge.deviget.mines.controller.payload.BoardResponse;
 import com.challenge.deviget.mines.controller.payload.PlayRequest;
 import com.challenge.deviget.mines.exception.GameException;
 import com.challenge.deviget.mines.model.Game;
+import com.challenge.deviget.mines.model.Marks;
 import com.challenge.deviget.mines.service.GameService;
 import lombok.extern.slf4j.Slf4j;
 import net.logstash.logback.marker.LogstashMarker;
@@ -53,6 +54,30 @@ public class GameController {
             return ResponseEntity.ok( mapToResponseBody(game));
         } catch (GameException e) {
             log.error(logMarker, LogConstants.OP_PLAY, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping(value = "/game/{userName}/flag", consumes = "application/json")
+    public ResponseEntity redFlag(@Valid @RequestBody PlayRequest request, @PathVariable String userName) {
+        try {
+            return ResponseEntity.ok(gameService.mark(userName, request, Marks.FLAG));
+        } catch (GameException e) {
+            log.error("[Minesweeper] Failed to set a red flag in row={}, column={} for username={}, exception={}", request.getRow(),
+                    request.getColumn(), userName, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping(value = "/game/{userName}/question",  consumes = "application/json")
+    public ResponseEntity questionMark(@Valid @RequestBody PlayRequest request, @PathVariable String userName) {
+        try {
+            // Get user name in the url path
+            // Call the service in order to set the question symbol in row and column in the user's game.
+            return ResponseEntity.ok(gameService.mark(userName, request, Marks.QUESTION_MARK));
+        } catch (GameException e) {
+            log.error("Failed to set a question symbol in row={}, column={} for username={}, exception={}", request.getRow(),
+                    request.getColumn(), userName, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
