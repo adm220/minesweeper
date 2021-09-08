@@ -45,12 +45,12 @@ public class GameController {
         }
     }
 
-    @PostMapping(value = "/game/{userName}",  consumes = "application/json")
-    public ResponseEntity playGame(@Valid @RequestBody PlayRequest request, @PathVariable String userName) {
+    @PostMapping(value = "/game/{username}",  consumes = "application/json")
+    public ResponseEntity playGame(@Valid @RequestBody PlayRequest request, @PathVariable String username) {
         LogstashMarker logMarker = append(LogConstants.KEY_REQUEST_BODY, request)
-                .and(append(LogConstants.KEY_USERNAME, userName));
+                .and(append(LogConstants.KEY_USERNAME, username));
         try {
-            Game game = gameService.play(userName, request);
+            Game game = gameService.play(username, request);
 
             logMarker.and(append(LogConstants.KEY_HTTP_STATUS, HttpStatus.OK).and(append(LogConstants.KEY_RESPONSE_BODY, game)));
             log.info(logMarker, LogConstants.OP_PLAY);
@@ -62,12 +62,12 @@ public class GameController {
         }
     }
 
-    @PutMapping(value = "/game/{userName}/flag", consumes = "application/json")
-    public ResponseEntity flag(@Valid @RequestBody PlayRequest request, @PathVariable String userName) {
+    @PutMapping(value = "/game/{username}/flag", consumes = "application/json")
+    public ResponseEntity flag(@Valid @RequestBody PlayRequest request, @PathVariable String username) {
         LogstashMarker logMarker = append(LogConstants.KEY_REQUEST_BODY, request)
-                .and(append(LogConstants.KEY_USERNAME, userName));
+                .and(append(LogConstants.KEY_USERNAME, username));
         try {
-            Game game = gameService.mark(userName, request, Marks.FLAG);
+            Game game = gameService.mark(username, request, Marks.FLAG);
 
             logMarker.and(append(LogConstants.KEY_HTTP_STATUS, HttpStatus.OK).and(append(LogConstants.KEY_RESPONSE_BODY, game)));
             log.info(logMarker, LogConstants.OP_FLAG);
@@ -79,12 +79,12 @@ public class GameController {
         }
     }
 
-    @PutMapping(value = "/game/{userName}/question",  consumes = "application/json")
-    public ResponseEntity questionMark(@Valid @RequestBody PlayRequest request, @PathVariable String userName) {
+    @PutMapping(value = "/game/{username}/question",  consumes = "application/json")
+    public ResponseEntity questionMark(@Valid @RequestBody PlayRequest request, @PathVariable String username) {
         LogstashMarker logMarker = append(LogConstants.KEY_REQUEST_BODY, request)
-                .and(append(LogConstants.KEY_USERNAME, userName));
+                .and(append(LogConstants.KEY_USERNAME, username));
         try {
-            Game game = gameService.mark(userName, request, Marks.QUESTION_MARK);
+            Game game = gameService.mark(username, request, Marks.QUESTION_MARK);
 
             logMarker.and(append(LogConstants.KEY_HTTP_STATUS, HttpStatus.OK).and(append(LogConstants.KEY_RESPONSE_BODY, game)));
             log.info(logMarker, LogConstants.OP_QUESTION_MARK);
@@ -96,11 +96,11 @@ public class GameController {
         }
     }
 
-    @GetMapping(value="/game/{userName}")
-    public ResponseEntity resume(@PathVariable String userName) {
-        LogstashMarker logMarker =append(LogConstants.KEY_USERNAME, userName);
+    @GetMapping(value="/game/{username}")
+    public ResponseEntity resume(@PathVariable String username) {
+        LogstashMarker logMarker =append(LogConstants.KEY_USERNAME, username);
         try {
-            Game game = gameService.resumeGame(userName);
+            Game game = gameService.resumeGame(username);
 
             logMarker.and(append(LogConstants.KEY_HTTP_STATUS, HttpStatus.OK).and(append(LogConstants.KEY_RESPONSE_BODY, game)));
             log.info(logMarker, LogConstants.OP_RESUME);
