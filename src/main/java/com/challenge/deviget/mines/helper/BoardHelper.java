@@ -2,11 +2,9 @@ package com.challenge.deviget.mines.helper;
 
 import com.challenge.deviget.mines.controller.payload.BoardRequest;
 import com.challenge.deviget.mines.model.Cell;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Random;
 
-@Slf4j
 public class BoardHelper {
 
 
@@ -34,7 +32,6 @@ public class BoardHelper {
                 minesPlaced ++;
             }
         }
-        log.info("Already installed mines for game of username={}", boardRequest.getName());
     }
 
 
@@ -84,7 +81,6 @@ public class BoardHelper {
     }
 
     public static void clearEmptySpots(Cell[][] matrix, int x, int y, int xMax, int yMax) {
-        // Base Case
         if (x < 0 || x > xMax || y < 0 || y > yMax){
             return;
         }

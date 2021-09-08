@@ -45,7 +45,7 @@ public class GameController {
         }
     }
 
-    @PostMapping(value = "/game/{username}",  consumes = "application/json")
+    @PutMapping(value = "/game/{username}/play",  consumes = "application/json")
     public ResponseEntity playGame(@Valid @RequestBody PlayRequest request, @PathVariable String username) {
         LogstashMarker logMarker = append(LogConstants.KEY_REQUEST_BODY, request)
                 .and(append(LogConstants.KEY_USERNAME, username));
