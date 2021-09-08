@@ -11,6 +11,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -33,12 +34,12 @@ public class GameEntity {
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
-    private Cell[][] mines;
+    private Cell[][] field;
 
     @Column
-    private Boolean flag;
+    private LocalDateTime startTime;
 
     @Column
-    private Boolean questionMark;
+    private LocalDateTime endTime;
 
 }

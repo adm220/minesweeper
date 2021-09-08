@@ -37,6 +37,7 @@ public class GameController {
             Game game = gameService.createGame(request);
 
             logMarker.and(append(LogConstants.KEY_HTTP_STATUS, HttpStatus.CREATED).and(append(LogConstants.KEY_RESPONSE_BODY, game)));
+            log.info(logMarker, LogConstants.OP_NEW_GAME);
             return ResponseEntity.status(HttpStatus.CREATED).body(mapToResponseBody(game));
         } catch (GameException e) {
             log.error(logMarker, LogConstants.OP_NEW_GAME, e);
@@ -51,6 +52,9 @@ public class GameController {
         try {
             Game game = gameService.play(userName, request);
 
+            logMarker.and(append(LogConstants.KEY_HTTP_STATUS, HttpStatus.OK).and(append(LogConstants.KEY_RESPONSE_BODY, game)));
+            log.info(logMarker, LogConstants.OP_PLAY);
+
             return ResponseEntity.ok( mapToResponseBody(game));
         } catch (GameException e) {
             log.error(logMarker, LogConstants.OP_PLAY, e);
@@ -59,26 +63,52 @@ public class GameController {
     }
 
     @PutMapping(value = "/game/{userName}/flag", consumes = "application/json")
-    public ResponseEntity redFlag(@Valid @RequestBody PlayRequest request, @PathVariable String userName) {
+    public ResponseEntity flag(@Valid @RequestBody PlayRequest request, @PathVariable String userName) {
+        LogstashMarker logMarker = append(LogConstants.KEY_REQUEST_BODY, request)
+                .and(append(LogConstants.KEY_USERNAME, userName));
         try {
-            return ResponseEntity.ok(gameService.mark(userName, request, Marks.FLAG));
+            Game game = gameService.mark(userName, request, Marks.FLAG);
+
+            logMarker.and(append(LogConstants.KEY_HTTP_STATUS, HttpStatus.OK).and(append(LogConstants.KEY_RESPONSE_BODY, game)));
+            log.info(logMarker, LogConstants.OP_FLAG);
+
+            return ResponseEntity.ok(mapToResponseBody(game));
         } catch (GameException e) {
-            log.error("[Minesweeper] Failed to set a red flag in row={}, column={} for username={}, exception={}", request.getRow(),
-                    request.getColumn(), userName, e);
+            log.error(logMarker, LogConstants.OP_FLAG, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
     @PutMapping(value = "/game/{userName}/question",  consumes = "application/json")
     public ResponseEntity questionMark(@Valid @RequestBody PlayRequest request, @PathVariable String userName) {
+        LogstashMarker logMarker = append(LogConstants.KEY_REQUEST_BODY, request)
+                .and(append(LogConstants.KEY_USERNAME, userName));
         try {
-            // Get user name in the url path
-            // Call the service in order to set the question symbol in row and column in the user's game.
-            return ResponseEntity.ok(gameService.mark(userName, request, Marks.QUESTION_MARK));
+            Game game = gameService.mark(userName, request, Marks.QUESTION_MARK);
+
+            logMarker.and(append(LogConstants.KEY_HTTP_STATUS, HttpStatus.OK).and(append(LogConstants.KEY_RESPONSE_BODY, game)));
+            log.info(logMarker, LogConstants.OP_QUESTION_MARK);
+
+            return ResponseEntity.ok(mapToResponseBody(game));
         } catch (GameException e) {
-            log.error("Failed to set a question symbol in row={}, column={} for username={}, exception={}", request.getRow(),
-                    request.getColumn(), userName, e);
+            log.error(logMarker, LogConstants.OP_QUESTION_MARK, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping(value="/game/{userName}")
+    public ResponseEntity resume(@PathVariable String userName) {
+        LogstashMarker logMarker =append(LogConstants.KEY_USERNAME, userName);
+        try {
+            Game game = gameService.resumeGame(userName);
+
+            logMarker.and(append(LogConstants.KEY_HTTP_STATUS, HttpStatus.OK).and(append(LogConstants.KEY_RESPONSE_BODY, game)));
+            log.info(logMarker, LogConstants.OP_RESUME);
+
+            return ResponseEntity.ok(mapToResponseBody(game));
+        } catch (GameException e) {
+            log.error(logMarker, LogConstants.OP_PLAY, e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 

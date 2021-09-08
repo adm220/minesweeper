@@ -11,4 +11,6 @@ public interface GameService {
     Game play(String username, PlayRequest request);
 
     Game mark(String username, PlayRequest request, Marks mark);
+
+    Game resumeGame(String username);
 }

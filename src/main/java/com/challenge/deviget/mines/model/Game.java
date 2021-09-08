@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -12,9 +15,9 @@ import lombok.NoArgsConstructor;
 public class Game {
     private String username;
     private States state;
-    private Cell[][] mines;
-    private boolean flag;
-    private boolean questionMark;
+    private Cell[][] field;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
 }
 

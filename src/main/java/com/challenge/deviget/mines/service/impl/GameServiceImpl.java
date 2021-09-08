@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Slf4j
@@ -37,13 +38,15 @@ public class GameServiceImpl implements GameService {
             BoardHelper.setMinesArround(boardRequest, matrixBoard);
 
             GameEntity game = GameEntity.builder()
-                    .mines(matrixBoard)
+                    .field(matrixBoard)
                     .userName(boardRequest.getName())
+                    .startTime(LocalDateTime.now())
+                    .state(States.ACTIVE)
                     .build();
             game = gameRepository.save(game);
 
 
-            return Game.builder().username(game.getUserName()).state(game.getState()).mines(game.getMines()).build();
+            return Game.builder().username(game.getUserName()).state(game.getState()).field(game.getField()).build();
 
         } catch(Exception ex) {
             throw new GameException(String.format("Error creating a new game for username=%s",
@@ -58,11 +61,10 @@ public class GameServiceImpl implements GameService {
         int column = request.getColumn();
 
         Optional<GameEntity> game = gameRepository.findByUserNameAndState(username, States.ACTIVE);
-
         if (!game.isPresent()) {
             throw new GameException(String.format("There's no active game for username=%s", username));
         }
-        matrixBoard = game.get().getMines();
+        matrixBoard = game.get().getField();
 
 
         if (BoardHelper.mineFound(matrixBoard, row, column)) {
@@ -71,7 +73,7 @@ public class GameServiceImpl implements GameService {
 
             BoardHelper.clearEmptySpots(matrixBoard, request.getRow(), request.getColumn(), matrixBoard.length - 1, matrixBoard[0].length - 1);
             matrixBoard[row][column].setRevealed(true);
-            game.get().setMines(matrixBoard);
+            game.get().setField(matrixBoard);
 
             if (BoardHelper.alreadyWon(matrixBoard)) {
                 game.get().setState(States.WON);
@@ -91,19 +93,32 @@ public class GameServiceImpl implements GameService {
             throw new GameException(String.format("There's no active game for username=%s", username));
         }
 
-        if (game.get().getMines()[request.getRow()][request.getColumn()].isRevealed()) {
+        if (game.get().getField()[request.getRow()][request.getColumn()].isRevealed()) {
             throw new GameException("Cell already revealed");
         }
 
         if (mark.equals(Marks.FLAG)) {
-            game.get().setFlag(true);
+            game.get().getField()[request.getRow()][request.getColumn()].setFlag(true);
         } else {
-            game.get().setQuestionMark(true);
+            game.get().getField()[request.getRow()][request.getColumn()].setQuestionMark(true);
         }
 
         Game gameNew = new Game();
         BeanUtils.copyProperties(gameRepository.save(game.get()),gameNew);
 
         return gameNew;
+    }
+
+    @Override
+    public Game resumeGame(String username) {
+        return gameRepository.findByUserNameAndState(username, States.ACTIVE)
+                .map(game -> Game.builder()
+                        .field(game.getField())
+                        .username(game.getUserName())
+                        .state(game.getState())
+                        .startTime(game.getStartTime())
+                        .endTime(game.getEndTime())
+                        .build())
+                .orElseThrow(() -> new GameException(String.format("There's no active game for username=%s", username)));
     }
 }
