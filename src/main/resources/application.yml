@@ -1,1 +1,12 @@
+jasypt:
+  encryptor:
+    password: ${JASYPT_DECRYPT_PASSWORD}
+security:
+  tokens:
+    - nome: diogo
+      token: ENC(zslU5aTdx/pC431B1H53ANDVC3dBHyJmEQam1Sr50goWATQpVifN9A8BQLOczMi+)
+    - nome: deviget
+      token: ENC(1+NoIVdweE8a9CtXAfmQ/r87AAV4jHZQnWYgD5wBIovyKJDDh/bhl9j2/5+SI1ts)
+
+
 

@@ -3,6 +3,8 @@ package com.challenge.deviget.mines.service.impl;
 import com.challenge.deviget.mines.controller.payload.BoardRequest;
 import com.challenge.deviget.mines.controller.payload.PlayRequest;
 import com.challenge.deviget.mines.exception.GameException;
+import com.challenge.deviget.mines.exception.GameNotFoundException;
+import com.challenge.deviget.mines.exception.InvalidActionException;
 import com.challenge.deviget.mines.helper.BoardHelper;
 import com.challenge.deviget.mines.model.Cell;
 import com.challenge.deviget.mines.model.Game;
@@ -26,11 +28,11 @@ public class GameServiceImpl implements GameService {
 
 
     @Override
-    public Game createGame(BoardRequest boardRequest) {
+    public Game createGame(BoardRequest boardRequest, String username) {
         Cell[][] matrixBoard;
         try {
-            if (gameRepository.findByUserNameAndState(boardRequest.getName(), States.ACTIVE).isPresent()) {
-                throw new GameException(String.format("A game has been found for username=%s", boardRequest.getName()));
+            if (gameRepository.findByUserNameAndState(username, States.ACTIVE).isPresent()) {
+                throw new InvalidActionException(String.format("A game has been found for username=%s", username));
             }
             matrixBoard = BoardHelper.initializeBoardGame(boardRequest);
 
@@ -39,7 +41,7 @@ public class GameServiceImpl implements GameService {
 
             GameEntity game = GameEntity.builder()
                     .field(matrixBoard)
-                    .userName(boardRequest.getName())
+                    .userName(username)
                     .startTime(LocalDateTime.now())
                     .state(States.ACTIVE)
                     .build();
@@ -50,7 +52,7 @@ public class GameServiceImpl implements GameService {
 
         } catch(Exception ex) {
             throw new GameException(String.format("Error creating a new game for username=%s",
-                    boardRequest.getName()), ex);
+                    username), ex);
         }
     }
 
@@ -62,13 +64,14 @@ public class GameServiceImpl implements GameService {
 
         Optional<GameEntity> game = gameRepository.findByUserNameAndState(username, States.ACTIVE);
         if (!game.isPresent()) {
-            throw new GameException(String.format("There's no active game for username=%s", username));
+            throw new GameNotFoundException(String.format("There's no active game for username=%s", username));
         }
         matrixBoard = game.get().getField();
 
 
         if (BoardHelper.mineFound(matrixBoard, row, column)) {
             game.get().setState(States.EXPLODE);
+            game.get().setEndTime(LocalDateTime.now());
         } else {
 
             BoardHelper.clearEmptySpots(matrixBoard, request.getRow(), request.getColumn(), matrixBoard.length - 1, matrixBoard[0].length - 1);
@@ -77,6 +80,7 @@ public class GameServiceImpl implements GameService {
 
             if (BoardHelper.alreadyWon(matrixBoard)) {
                 game.get().setState(States.WON);
+                game.get().setEndTime(LocalDateTime.now());
             }
         }
         Game gameNew = new Game();
@@ -90,11 +94,11 @@ public class GameServiceImpl implements GameService {
         Optional<GameEntity> game = gameRepository.findByUserNameAndState(username, States.ACTIVE);
 
         if (!game.isPresent()) {
-            throw new GameException(String.format("There's no active game for username=%s", username));
+            throw new GameNotFoundException(String.format("There's no active game for username=%s", username));
         }
 
         if (game.get().getField()[request.getRow()][request.getColumn()].isRevealed()) {
-            throw new GameException("Cell already revealed");
+            throw new InvalidActionException("Cell already revealed");
         }
 
         if (mark.equals(Marks.FLAG)) {
@@ -119,6 +123,6 @@ public class GameServiceImpl implements GameService {
                         .startTime(game.getStartTime())
                         .endTime(game.getEndTime())
                         .build())
-                .orElseThrow(() -> new GameException(String.format("There's no active game for username=%s", username)));
+                .orElseThrow(() -> new GameNotFoundException(String.format("There's no active game for username=%s", username)));
     }
 }

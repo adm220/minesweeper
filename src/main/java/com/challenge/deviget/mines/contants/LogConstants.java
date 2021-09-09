@@ -8,6 +8,7 @@ public class LogConstants {
     public static final String OP_FLAG = "flag";
     public static final String OP_QUESTION_MARK = "questionMark";
     public static final String OP_RESUME = "resumeGame";
+    public static final String OP_UNKNOWN_ERROR = "unknonwError";
 
     private LogConstants(){}
 

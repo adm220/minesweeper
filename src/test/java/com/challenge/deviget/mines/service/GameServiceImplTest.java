@@ -46,7 +46,7 @@ class GameServiceImplTest {
     void testCreateGameSuccessful() {
         when(gameRepository.findByUserNameAndState(USERNAME, States.ACTIVE)).thenReturn(Optional.empty());
         when(gameRepository.save(any(GameEntity.class))).thenReturn(game);
-        gameService.createGame(BoardRequest.builder().level(Level.EASY).name(USERNAME).build());
+        gameService.createGame(BoardRequest.builder().level(Level.EASY).build(),USERNAME);
 
         verify(gameRepository, times(1)).save(any(GameEntity.class));
     }
@@ -56,7 +56,7 @@ class GameServiceImplTest {
         when(gameRepository.findByUserNameAndState(USERNAME, States.ACTIVE))
                 .thenReturn(Optional.of(new GameEntity()));
         Assertions.assertThrows(GameException.class, () -> {
-            gameService.createGame(BoardRequest.builder().level(Level.EASY).name(USERNAME).build());
+            gameService.createGame(BoardRequest.builder().level(Level.EASY).build(), USERNAME);
         });
 
     }

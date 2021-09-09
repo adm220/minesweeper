@@ -25,6 +25,9 @@ public class GameEntity {
     private String userName;
 
     @Column
+    private String gameName;
+
+    @Column
     @Enumerated(EnumType.STRING)
     private States state;
 

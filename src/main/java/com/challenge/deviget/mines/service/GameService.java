@@ -6,7 +6,7 @@ import com.challenge.deviget.mines.model.Game;
 import com.challenge.deviget.mines.model.Marks;
 
 public interface GameService {
-    Game createGame(BoardRequest boardRequest);
+    Game createGame(BoardRequest boardRequest, String username);
 
     Game play(String username, PlayRequest request);
 
