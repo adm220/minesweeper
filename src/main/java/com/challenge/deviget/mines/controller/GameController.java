@@ -151,7 +151,7 @@ public class GameController {
 
             return ResponseEntity.ok(mapToResponseBody(game));
         } catch (GameNotFoundException e) {
-            log.error(logMarker, LogConstants.OP_PLAY, e);
+            log.error(logMarker, LogConstants.OP_RESUME, e);
             return  new ResponseEntity(ErrorResponse.builder().errorMessage(e.getMessage()).build(),HttpStatus.NOT_FOUND);
         }
     }

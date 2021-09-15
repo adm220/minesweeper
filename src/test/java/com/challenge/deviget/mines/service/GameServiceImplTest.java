@@ -39,7 +39,7 @@ class GameServiceImplTest {
     @BeforeEach
     void setup() {
         Cell[][] field = new Cell[2][2];
-        game = GameEntity.builder().id(321L).userName(USERNAME).field(field).build();
+        game = GameEntity.builder().id(321L).userName(USERNAME).field(field).state(States.ACTIVE).build();
     }
 
     @Test
@@ -148,6 +148,13 @@ class GameServiceImplTest {
         ArgumentCaptor<GameEntity> captor = ArgumentCaptor.forClass(GameEntity.class);
         verify(gameRepository, times(1)).save(captor.capture());
         assertThat(captor.getValue().getState(), is(States.EXPLODE));
+    }
+    @Test
+    void testPlayGameAlreadyFinished() {
+        when(gameRepository.findByUserNameAndState(USERNAME, States.WON)).thenReturn(Optional.empty());
+        Assertions.assertThrows(GameException.class, () -> {
+            gameService.play(USERNAME, PlayRequest.builder().column(0).row(0).build());
+        });
     }
 }
 

@@ -63,9 +63,7 @@ public class GameServiceImpl implements GameService {
         int column = request.getColumn();
 
         Optional<GameEntity> game = gameRepository.findByUserNameAndState(username, States.ACTIVE);
-        if (!game.isPresent()) {
-            throw new GameNotFoundException(String.format("There's no active game for username=%s", username));
-        }
+        validateStartedGame(username, game);
         matrixBoard = game.get().getField();
 
 
@@ -89,13 +87,12 @@ public class GameServiceImpl implements GameService {
         return gameNew;
     }
 
+
     @Override
     public Game mark(String username, PlayRequest request, Marks mark) {
         Optional<GameEntity> game = gameRepository.findByUserNameAndState(username, States.ACTIVE);
 
-        if (!game.isPresent()) {
-            throw new GameNotFoundException(String.format("There's no active game for username=%s", username));
-        }
+        validateStartedGame(username, game);
 
         if (game.get().getField()[request.getRow()][request.getColumn()].isRevealed()) {
             throw new InvalidActionException("Cell already revealed");
@@ -123,6 +120,15 @@ public class GameServiceImpl implements GameService {
                         .startTime(game.getStartTime())
                         .endTime(game.getEndTime())
                         .build())
-                .orElseThrow(() -> new GameNotFoundException(String.format("There's no active game for username=%s", username)));
+                .orElseThrow(() -> new GameNotFoundException(String.format("There's no game for username=%s", username)));
+    }
+
+    private void validateStartedGame(String username, Optional<GameEntity> game) {
+        if (!game.isPresent()) {
+            throw new GameNotFoundException(String.format("There's no active game for username=%s", username));
+        }
+        if(game.get().getState() != States.ACTIVE){
+            throw new InvalidActionException(String.format("Game already is finished for username=%s., Please start a new one", username));
+        }
     }
 }
