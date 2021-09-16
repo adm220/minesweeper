@@ -37,7 +37,7 @@ public class GameController {
     @Autowired
     private GameService gameService;
 
-
+    @ApiOperation(value = "Create a new game")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Created",response = BoardResponse.class),
             @ApiResponse(code = 401, message = "Invalid api-key", response = ErrorResponse.class),
@@ -58,7 +58,7 @@ public class GameController {
             return new ResponseEntity(ErrorResponse.builder().errorMessage(e.getMessage()).build(),HttpStatus.CONFLICT);
         }
     }
-
+    @ApiOperation(value = "Reveal a cell")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Ok",response = BoardResponse.class),
             @ApiResponse(code = 401, message = "Invalid api-key", response = ErrorResponse.class),
@@ -81,7 +81,7 @@ public class GameController {
             return new ResponseEntity(ErrorResponse.builder().errorMessage(e.getMessage()).build(),HttpStatus.NOT_FOUND);
         }
     }
-
+    @ApiOperation(value = "Mark a cell with a redflag")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Ok",response = BoardResponse.class),
             @ApiResponse(code = 401, message = "Invalid api-key", response = ErrorResponse.class),
@@ -108,7 +108,7 @@ public class GameController {
             return new ResponseEntity(ErrorResponse.builder().errorMessage(e.getMessage()).build(),HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
-
+    @ApiOperation(value = "Mark a cell with a question mark")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Ok",response = BoardResponse.class),
             @ApiResponse(code = 401, message = "Invalid api-key", response = ErrorResponse.class),
@@ -135,6 +135,7 @@ public class GameController {
             return new ResponseEntity(ErrorResponse.builder().errorMessage(e.getMessage()).build(),HttpStatus.UNPROCESSABLE_ENTITY);
         }
     }
+    @ApiOperation(value = "Return the last game")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Ok",response = BoardResponse.class),
             @ApiResponse(code = 401, message = "Invalid api-key", response = ErrorResponse.class),
