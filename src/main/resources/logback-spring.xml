@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+<!--
+                <encoder>
+                    <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+                    <charset>utf8</charset>
+                </encoder>
+-->
+
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <timeZone>UTC</timeZone>
+            <jsonFactoryDecorator class="com.challenge.deviget.mines.config.LocalDateTimeDecorator" />
+        </encoder>
+    </appender>
+
+
+    <root level="INFO">
+
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>
