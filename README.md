@@ -1,39 +1,93 @@
 # minesweeper-API
-API test
 
-We ask that you complete the following challenge to evaluate your development skills. Please use the programming language and framework discussed during your interview to accomplish the following task.
+That is a java springboot application, built to be the backend of a minesweeper game.  
 
-PLEASE DO NOT FORK THE REPOSITORY. WE NEED A PUBLIC REPOSITORY FOR THE REVIEW. 
+## Architecture
+1. Java + Springboot 2 + maven
+2. Dockerhub as the registry to the game's image
+3. Aws AppRunner to deploy the game
 
-## The Game
-Develop the classic game of [Minesweeper](https://en.wikipedia.org/wiki/Minesweeper_(video_game))
+## Out of Scope
+* Pipeline
+* Infrastructure as Code
+* High level database
+* Multiples Profiles
 
-## Show your work
+## Running the application
+```
+JASYPT_DECRYPT_PASSWORD=deviget mvn spring-boot:run
+```
+### Debug mode
+```
+JASYPT_DECRYPT_PASSWORD=deviget mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000"
+```
+## Build a docker image
+```
+JASYPT_DECRYPT_PASSWORD=deviget mvn package dockerfile:build
+```
+---
+## What was built
 
-1.  Create a Public repository ( please dont make a pull request, clone the private repository and create a new plublic one on your profile)
-2.  Commit each step of your process so we can follow your thought process.
+That is an API to play the minesweeper game. You can select a level(EASY, MEDIUM or HARD) to have different sizes of 
+board and mines. You have to authenticate yourself in the API although. Your game will be saved in your username.
 
-## What to build
-The following is a list of items (prioritized from most important to least important) we wish to see:
-* Design and implement  a documented RESTful API for the game (think of a mobile app for your API)
-* Implement an API client library for the API designed above. Ideally, in a different language, of your preference, to the one used for the API
-* When a cell with no adjacent mines is revealed, all adjacent squares will be revealed (and repeat)
-* Ability to 'flag' a cell with a question mark or red flag
-* Detect when game is over
-* Persistence
-* Time tracking
-* Ability to start a new game and preserve/resume the old ones
-* Ability to select the game parameters: number of rows, columns, and mines
-* Ability to support multiple users/accounts
+The player can stop playing the game and return any time, but the player can just have one active game.
+
+When the game finishes, won or not, a new game need to be started.
+
+An OpenAPI based documentation could be accessed by <https://xdnpsusfzc.us-east-1.awsapprunner.com/v2/api-docs> or, 
+if you prefer, access <https://xdnpsusfzc.us-east-1.awsapprunner.com/swagger-ui.html> to see friendly interface of the documentation.
+You can use the interface to test the API to, but an authentication is needed.
+
+There is a **minesweeper_node_client.zip** file, that is a typescript transpiled client to access the API.
+
+## Technical Decisions
+The Springboot java application was chosen because this is a stack very used nowadays in APIs, specially java based API.
+A simple spring security authentication was built and the api-key was encrypted by jasypt framework.
+
+Just to facilitate the whole architecture, I decided to keep an in memory database to persist data.
+
+For logging, a json encoder was used to create an indexed log, so we can use a stack to monitor the application like: elastic stack, loki + grafana, 
+Cloudwatch(app runner use it by default). Indexed log help us to make specific research using query.
+
+
+For documentation, a swagger/openapi java implementation was built, with the goal to create a useful interface to read and test the API.
+So this implementation generates a UI to use the api and a yaml documentation's format.
+
+To become easy to deploy, scale and mitigate risks, the implementation has an integration with a maven plugin to generate docker images.
+My public repository in dockerhub was used to share the images I generated in development process.
+
+Every challenge I get, even for interview purposes, I always try to learn something new. 
+Of course this decision is technical based, it is not a "felt right". For this challenge I toke two new things to stay in touch:
+* AWS App Runner Service
+* Nodejs/Typescrit environment
+
+App Runner because AWS is the bigger cloud company nowadays, and they released recently this service that brings features like Heroku.
+
+Node/Typescript environment was chosen because I still intend to build a ReactJs(learning purposes) interface for this game, so I made some research to find Typescript as 
+a good language to do that and this code be reused by React after.
  
-## Deliverables we expect:
-* URL where the game can be accessed and played (use any platform of your preference: heroku.com, aws.amazon.com, etc)
-* Code in a public Github repo
-* README file with the decisions taken and important notes
+### Another important data
+#### Aplication domain
+```
+https://xdnpsusfzc.us-east-1.awsapprunner.com
+```
+#### Api-keys to be used
+```
+8946fbf3-7b07-4dbd-8cc6-4dd3455ae3b1 or 37bb4b30-4414-406d-badb-6400756a9529
+```
 
-## Time Spent
-You need to fully complete the challenge. We suggest not spending more than 3 days total.  Please make commits as often as possible so we can see the time you spent and please do not make one commit.  We will evaluate the code and time spent.
- 
-What we want to see is how well you handle yourself given the time you spend on the problem, how you think, and how you prioritize when time is sufficient to solve everything.
+#### Jasypt Secret Key
+```
+deviget
+```
+#### DockerHub image URL
+```
+https://hub.docker.com/r/diogomartinez/challenge-deviget/
+```
+#### Another projects I built
 
-Please email your solution as soon as you have completed the challenge or the time is up
+* <https://bitbucket.org/diogo_martinez/cadastro-clientes/> -- a Customer API built in java + terraform + aws ecs fargate
+* <https://bitbucket.org/diogo_martinez/desafiom4u/> -- an API that consumes rest and soap client api in java springboot with a lot of tests(unit and integration tests)
+
+
